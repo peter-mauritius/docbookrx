@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<section id="doveadm_fetch_ref_sect">
+  <title id="doveadm_fetch_ref_tit">doveadm fetch</title>
+  <section>
+    <title>Synopsis</title>
+    <para>
+      <cmdsynopsis>
+        <command>doveadm</command>
+        &fdovecot_doveadm_global_opts_args;
+        &fdovecot_doveadm_format_opts_args;
+        <arg>month <arg>year</arg></arg>
+        <group>
+        <group>
+          <arg>-H</arg>
+          <arg>-L</arg>
+          <arg>-P</arg>
+        </group>
+        </group>
+        <arg choice="plain">fetch</arg>
+        &fdovecot_doveadm_socket_opts_args;
+        &fdovecot_doveadm_user_opts_args;
+        <arg choice="req"><replaceable>fields</replaceable></arg>
+        <arg choice="req"><replaceable>search_query</replaceable></arg>
+        <arg>-R
+          <group>
+            <arg>-H</arg>
+            <arg>-L</arg>
+            <arg>-P</arg>
+          </group>
+        </arg>
+        <arg>-f</arg>
+        <arg choice='plain'><replaceable>group</replaceable></arg>
+        <arg rep='repeat' choice='plain'><replaceable>file</replaceable></arg>
+        <arg>month <arg>year</arg></arg>
+      </cmdsynopsis>
+    </para>
+  </section>
+
+  <section>
+    <title>Beschreibung</title>
+    <para>
+      <command>doveadm fetch</command> kann dazu benutzt werden, den Inhalt oder die Metadaten von Nachrichten abzurufen.
+      Dies kann beispielsweise in Shellskripten oder zum Debuggen verwendet <productname>werden</productname>.
+    </para>
+  </section>
+
+  <section>
+    <title>Optionen</title>
+    <para>Generell stehen jedem Kommando von <xref endterm="doveadm_ref_tit" linkend="doveadm_sect"/> die allgemeinen globalen Optionen zur Verfügung (siehe <xref  linkend="doveadm_global_opt_sect"/>).</para>
+
+    <para>Kommandospezifische Optionen sind:</para>
+    <variablelist>
+      &fdovecot_doveadm_socket_opts_varlistentries;
+      &fdovecot_doveadm_user_opts_varlistentries;
+    </variablelist>
+  </section>
+
+  <section>
+    <title>Parameter</title>
+
+    <variablelist>
+      <varlistentry>
+        <term><replaceable>fields</replaceable></term>
+        <listitem>
+          <para>
+            Ein oder mehrere auszugebende Ergebnisfelder.
+            Um mehrere Felder anzugeben, werden diese in Anführungszeichen gesetzt und durch Leerzeichen getrennt, z.B. <computeroutput>"body flags"</computeroutput>.
+          </para>
+
+          <para>
+            Unterstützte Felder sind:
+            <variablelist>
+              <varlistentry>
+                <term>body</term>
+                <listitem><para>Der Nachrichtenbody.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>date.received</term>
+                <listitem>
+		    <para><simplelist>
+			<member>Datum und Uhrzeit der ersten Zustellung in die Benutzermailbox (d.h. Zeitsstempel des letzten Received: Headers der Nachricht).</member>
+			<member>Bei Nachrichten, die mittels IMAP COPY erzeugt wurden: date.received der Quellnachricht.</member>
+			<member>Bei Nachrichten, die mittels IMAP APPEND erzeugt wurden: Wert des date-time Attributs falls gesetzt andernfalls der aktuelle Zeitstempel
+                    zum Zeitpunkt des Speicherns.</member>
+		      </simplelist>
+                  </para>
+                </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>date.saved</term>
+                <listitem><para>Datum und Uhrzeit der Speicherung in der Benutzermailbox.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>date.sent</term>
+                <listitem><para>Datum und Uhrzeit des Date: Headers der Nachricht.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>flags</term>
+                <listitem><para>Die IMAP Flags der Nachricht, z.B. \Seen.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>guid</term>
+                <listitem><para>Die GUID (globally unique identifier) der Nachricht.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>hdr</term>
+                <listitem><para>Der Nachrichtenheader.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>imap.body</term>
+                <listitem><para>Die Ausgabe des IMAP BODY Befehls für diese Nachricht (siehe <xref linkend="rfc3501" />).</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>imap.bodystructure</term>
+                <listitem><para>Die Ausgabe des IMAP BODYSTRUCTURE Befehls für diese Nachricht (siehe <xref linkend="rfc3501" />).</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>imap.envelope</term>
+                <listitem><para>Die Ausgabe des IMAP ENVELOPE Befehls für diese Nachricht (siehe <xref linkend="rfc3501" />).</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>mailbox</term>
+                <listitem><para>Name der Mailbox (Ordner), in dem die Nachricht liegt. Der Name wird in UTF-8 ausgegeben.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>mailbox-guid</term>
+                <listitem><para>GUID der Mailbox in dem die Nachricht liegt.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>pop3.uidl</term>
+                <listitem><para>Die POP3 uidl (unique identifier) der Nachricht innerhalb einer Mailbox.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>seq</term>
+                <listitem><para>Die fortlaufende Nummer einer Nachricht innerhalb einer Mailbox.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>size.physical</term>
+                <listitem><para>Die physische Größe einer Nachricht.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>size.virtual</term>
+                <listitem><para>Die virtuelle Größe einer Nachricht (nach Umwandlung mit CRLF Zeilenenden).</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>text</term>
+                <listitem><para>Die gesamte Nachricht (Header und Body).</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>text.utf8</term>
+                <listitem><para>Die gesamte Nachricht (Header und Body), UTF-8 encodiert.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>uid</term>
+                <listitem><para>Die IMAP uid (unique identifier) der Nachricht innerhalb einer Mailbox.</para></listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>user</term>
+                <listitem><para>Der Benutzername (im &fdovecot_t_email_system; ist das die MID) des Nachrichtenbesitzers.</para></listitem>
+              </varlistentry>
+            </variablelist>
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><replaceable>search_query</replaceable></term>
+        <listitem>
+          <para>
+            Gibt die Suchmaske der auszugebenden Mails an.
+            &fdovecot_doveadm_search_query_details;
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section>
+    <title>Beispiel</title>
+    <para>
+      In diesem Beispiel werden die Felder date.received, date.sent und flags der Nachrichten mit der uid 2 und 7
+      aus der INBOX des Benutzers 1234 ausgegeben.
+    </para>
+    <programlisting>
+doveadm fetch -u 1234 "date.received date.sent flags" mailbox INBOX uid 2,7
+date.received: 2012-01-30 09:42:39
+date.sent: 2012-01-30 09:17:12 (+0000)
+flags: \Seen spam
+^L
+date.received: 2012-01-29 17:34:12
+date.sent: 2012-01-29 16:17:09 (+0000)
+flags:
+^L
+    </programlisting>
+  </section>
+</section>
