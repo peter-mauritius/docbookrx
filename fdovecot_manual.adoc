@@ -1,0 +1,16 @@
+= T-eMail 4.0
+Ewald Dieterich; Claudia Grotzfeld; Andre Gröbe; Harald Kollera; Heiko Müller-Meißner; Achim Stahlberger; Peter Mauritius
+v0.2, 05.04.2023
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+
+[[_version_history_chap]]
+== Versionshistorie
+
+[source]
+----
+
+----

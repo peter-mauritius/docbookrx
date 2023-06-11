@@ -7,15 +7,17 @@
     <para>
       <cmdsynopsis>
         <command>doveadm</command>
-        &fdovecot_doveadm_global_opts_args;
-        &fdovecot_doveadm_format_opts_args;
+        &fdovecot_doveadm_socket_opts_varlistentries;
+
+        <arg choice="opt"><option>-S</option>&nbsp;<replaceable>socket_path</replaceable></arg>
+
         <arg>month <arg>year</arg></arg>
         <group>
-        <group>
-          <arg>-H</arg>
-          <arg>-L</arg>
-          <arg>-P</arg>
-        </group>
+          <group>
+            <arg>-H</arg>
+            <arg>-L</arg>
+            <arg>-P</arg>
+          </group>
         </group>
         <arg choice="plain">fetch</arg>
         &fdovecot_doveadm_socket_opts_args;
@@ -33,7 +35,18 @@
         <arg choice='plain'><replaceable>group</replaceable></arg>
         <arg rep='repeat' choice='plain'><replaceable>file</replaceable></arg>
         <arg>month <arg>year</arg></arg>
+        <sbr/>
       </cmdsynopsis>
+      <cmdsynopsis>
+        <command>distributor.pl</command>
+        <arg choice="opt">-v</arg>
+        <arg choice="opt">-C <replaceable>config-file</replaceable></arg>
+        <arg choice="opt">-b <replaceable>begin</replaceable></arg>
+        <arg choice="opt">-e <replaceable>end</replaceable></arg>
+        <sbr/>
+      </cmdsynopsis>
+
+      Test
     </para>
   </section>
 

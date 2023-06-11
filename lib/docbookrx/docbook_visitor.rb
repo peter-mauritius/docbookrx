@@ -63,7 +63,7 @@ module Docbookrx
 
     LITERAL_NAMES = ANONYMOUS_LITERAL_NAMES + NAMED_LITERAL_NAMES
 
-    FORMATTING_NAMES = LITERAL_NAMES + ['emphasis']
+    FORMATTING_NAMES = LITERAL_NAMES + ['emphasis', 'arg']
 
     KEYWORD_NAMES = ['package', 'firstterm', 'citetitle']
 
@@ -317,7 +317,7 @@ module Docbookrx
       when "visit_group"
         @group_depth += 1
         @arg_count.push(0)
-        append_text '['
+        append_text ' ['
       when "visit_arg"
         count = @arg_count.pop
         if count != nil
@@ -351,7 +351,8 @@ module Docbookrx
         when "visit_table", "visit_informaltable"
           @in_table = false
         when "visit_group"
-          append_text ']'
+          empty_last_line = !lines.empty? && lines.last.empty?
+          append_text ' ]'
           @group_depth -= 1
           @arg_count.pop
         when "visit_emphasis", "process_literal"
@@ -709,115 +710,45 @@ module Docbookrx
     end
 
     def visit_arg node
-      marker = (node.parent.name == 'orderedlist' || node.parent.name == 'procedure' ? '.' * @list_depth :
-                  (node.parent.name == 'stepalternatives' ? 'a.' : '*' * @list_depth))
-
       is_group = node.parent.name == 'group'
       in_arg = node.parent.name == 'arg'
       choice = node.attributes["choice"]
       rep = node.attributes["rep"]
 
-      append_text marker
-
       unless node.elements.empty?
-        only_text = true
-        node.children.each do |child|
-          if !((FORMATTING_NAMES.include? child.name) || (child.name.eql? "text"))
-            only_text = false
-            break
-          end
-        end
-
-        if only_text
           text = format_text node
           arg_text = text.shift(1)[0]
+          arg_text.strip!
+          append_blank_line
           append_text ' [' + arg_text + ']'
-        else
-          node.children.each_with_index do |child, i|
-            if (child.name.eql? "text") && child.text.rstrip.empty?
-              next
-            end
-
-            local_continuation = false
-            unless i == 0 || (child.name == 'group' || child.name == 'arg' || child.name == 'simplelist' || child.name == 'orderedlist')
-              append_line '+'
-              @continuation = true
-              local_continuation = true
-              first_line = true
-            end
-
-            if (PARA_TAG_NAMES.include? child.name) || (child.name.eql? "text")
-              text = format_text child
-              item_text = text.shift(1)[0]
-
-              item_text = item_text.sub(/\A\+([^\n])/, "+\n\\1")
-              if item_text.empty? && text.empty?
-                next
-              end
-
-              item_text.split(EOL).each do |line|
-                line = line.gsub IndentationRx, ''
-                if line.length > 0
-                  if first_line
-                    if local_continuation # @continuation is reset by format_text
-                      append_line %(#{line})
-                    else
-                      append_text %( #{line})
-                    end
-                  else
-                    append_line %(  #{line})
-                  end
-                end
-              end
-
-              unless text.empty?
-                append_line '+' unless lines.last == "+"
-                lines.concat(text)
-              end
-            else
-              if !FORMATTING_NAMES.include? child.name
-                if first_line && !local_continuation
-                  append_text ' {empty}' # necessary to fool asciidoctorj into thinking that this is a listitem
-                end
-                unless local_continuation || (child.name == 'group' || child.name == 'arg' || child.name == 'simplelist' || child.name == 'orderedlist')
-                  append_line '+'
-                end
-                @continuation = false
-              end
-              child.accept self
-              @continuation = true
-            end
-          end
-        end
       else
         text = format_text node
-        item_text = text.shift(1)[0]
+        arg_text = text.shift(1)[0]
 
-        item_text.split(EOL).each do |line|
+        arg_text.split(EOL).each do |line|
           line = line.gsub IndentationRx, ''
+          line.strip!
           if line.length > 0
             count = @arg_count.last
               if is_group &&  count > 1
-                append_text %(| [#{line}])
+                append_text %( | [#{line}])
               else
                 append_text %( [#{line}])
               end
           end
         end
-
-        unless text.empty?
-          append_line '+'
-          lines.concat(text)
-        end
       end
-      @continuation = false
-      append_blank_line unless lines.last.empty?
+      # append_text ' '
+      # append_blank_line unless lines.last.empty?
 
       false
     end
 
     def visit_productname node
       format_append_text node, '_', '_'
+    end
+    def visit_superscript node
+      format_append_text node, '^', '^'
     end
 
     def visit_step node
@@ -826,6 +757,11 @@ module Docbookrx
 
     def visit_member node
       visit_listitem node
+    end
+
+    def visit_sbr node
+      append_blank_line
+      append_blank_line
     end
 
     # FIXME this method needs cleanup, remove hardcoded logic!

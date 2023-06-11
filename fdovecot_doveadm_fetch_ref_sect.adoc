@@ -1,0 +1,132 @@
+
+[[_doveadm_fetch_ref_sect]]
+= doveadm fetch
+
+== Synopsis
+
+`doveadm`
+ [[option]``-S``[replaceable]``socket_path``]
+ [month  [year]] [ [ [-H] | [-L] | [-P] ] ] [fetch]
+ [[replaceable]``fields``]
+ [[replaceable]``search_query``]
+ [-R  [ [-H] | [-L] | [-P] ]] [-f]
+ [[replaceable]``group``]
+ [[replaceable]``file``]
+ [month  [year]]
+
+`distributor.pl` [-v]
+ [-C [replaceable]``config-file``]
+ [-b [replaceable]``begin``]
+ [-e [replaceable]``end``]
+
+Test 
+
+== Beschreibung
+
+`doveadm fetch` kann dazu benutzt werden, den Inhalt oder die Metadaten von Nachrichten abzurufen.
+Dies kann beispielsweise in Shellskripten oder zum Debuggen verwendet _werden_. 
+
+== Optionen
+
+Generell stehen jedem Kommando von <<_doveadm_sect>> die allgemeinen globalen Optionen zur Verfügung (siehe <<_doveadm_global_opt_sect>>).
+
+Kommandospezifische Optionen sind:
+
+== Parameter
+
+[replaceable]``fields``::
+Ein oder mehrere auszugebende Ergebnisfelder.
+Um mehrere Felder anzugeben, werden diese in Anführungszeichen gesetzt und durch Leerzeichen getrennt, z.B. ``"body flags"``. 
++
+Unterstützte Felder sind: 
++
+
+body::
+Der Nachrichtenbody.
+
+date.received::
+
++
+
+* Datum und Uhrzeit der ersten Zustellung in die Benutzermailbox (d.h. Zeitsstempel des letzten Received: Headers der Nachricht).
+* Bei Nachrichten, die mittels IMAP COPY erzeugt wurden: date.received der Quellnachricht.
+* Bei Nachrichten, die mittels IMAP APPEND erzeugt wurden: Wert des date-time Attributs falls gesetzt andernfalls der aktuelle Zeitstempel
+  zum Zeitpunkt des Speicherns.
+
+
+date.saved::
+Datum und Uhrzeit der Speicherung in der Benutzermailbox.
+
+date.sent::
+Datum und Uhrzeit des Date: Headers der Nachricht.
+
+flags::
+Die IMAP Flags der Nachricht, z.B.
+\Seen.
+
+guid::
+Die GUID (globally unique identifier) der Nachricht.
+
+hdr::
+Der Nachrichtenheader.
+
+imap.body::
+Die Ausgabe des IMAP BODY Befehls für diese Nachricht (siehe <<_rfc3501>>).
+
+imap.bodystructure::
+Die Ausgabe des IMAP BODYSTRUCTURE Befehls für diese Nachricht (siehe <<_rfc3501>>).
+
+imap.envelope::
+Die Ausgabe des IMAP ENVELOPE Befehls für diese Nachricht (siehe <<_rfc3501>>).
+
+mailbox::
+Name der Mailbox (Ordner), in dem die Nachricht liegt.
+Der Name wird in UTF-8 ausgegeben.
+
+mailbox-guid::
+GUID der Mailbox in dem die Nachricht liegt.
+
+pop3.uidl::
+Die POP3 uidl (unique identifier) der Nachricht innerhalb einer Mailbox.
+
+seq::
+Die fortlaufende Nummer einer Nachricht innerhalb einer Mailbox.
+
+size.physical::
+Die physische Größe einer Nachricht.
+
+size.virtual::
+Die virtuelle Größe einer Nachricht (nach Umwandlung mit CRLF Zeilenenden).
+
+text::
+Die gesamte Nachricht (Header und Body).
+
+text.utf8::
+Die gesamte Nachricht (Header und Body), UTF-8 encodiert.
+
+uid::
+Die IMAP uid (unique identifier) der Nachricht innerhalb einer Mailbox.
+
+user::
+Der Benutzername (im  ist das die MID) des Nachrichtenbesitzers.
+
+[replaceable]``search_query``::
+Gibt die Suchmaske der auszugebenden Mails an. 
+
+== Beispiel
+
+In diesem Beispiel werden die Felder date.received, date.sent und flags der Nachrichten mit der uid 2 und 7 aus der INBOX des Benutzers 1234 ausgegeben. 
+
+[source]
+----
+
+doveadm fetch -u 1234 "date.received date.sent flags" mailbox INBOX uid 2,7
+date.received: 2012-01-30 09:42:39
+date.sent: 2012-01-30 09:17:12 (+0000)
+flags: \Seen spam
+^L
+date.received: 2012-01-29 17:34:12
+date.sent: 2012-01-29 16:17:09 (+0000)
+flags:
+^L
+----
