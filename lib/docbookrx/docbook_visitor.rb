@@ -49,7 +49,7 @@ module Docbookrx
 
     ADMONITION_NAMES = ['note', 'tip', 'warning', 'caution', 'important']
 
-    NORMAL_SECTION_NAMES = ['section', 'simplesect', 'sect1', 'sect2', 'sect3', 'sect4', 'sect5']
+    NORMAL_SECTION_NAMES = ['section', 'simplesect', 'sect1', 'sect2', 'sect3', 'sect4', 'sect5', 'refentry', 'refsect1']
 
     SPECIAL_SECTION_NAMES = ['abstract', 'appendix', 'bibliography', 'glossary', 'preface']
 
@@ -57,7 +57,7 @@ module Docbookrx
 
     SECTION_NAMES = DOCUMENT_NAMES + ['chapter', 'part'] + NORMAL_SECTION_NAMES + SPECIAL_SECTION_NAMES
 
-    ANONYMOUS_LITERAL_NAMES = ['abbrev', 'acronym', 'code', 'command', 'computeroutput', 'database', 'function', 'literal', 'tag', 'userinput']
+    ANONYMOUS_LITERAL_NAMES = ['abbrev', 'acronym', 'code', 'command', 'computeroutput', 'database', 'function', 'literal', 'tag', 'userinput', 'errortext', 'returnvalue']
 
     NAMED_LITERAL_NAMES = ['application', 'classname', 'constant', 'envar', 'exceptionname', 'interface', 'interfacename', 'methodname', 'option', 'parameter', 'property', 'replaceable', 'type', 'varname']
 
@@ -495,7 +495,7 @@ module Docbookrx
         doc = ::Nokogiri::XML::Document.parse(::File.read include_infile)
         # TODO pass in options that were passed to this visitor
         visitor = self.class.new
-        doc.root.accept visitor
+        doc.root.accept visitorx
         result = visitor.lines
         result.shift while result.size > 0 && result.first.empty?
         ::File.open(include_outfile, 'w') { |f| f.write(visitor.lines * EOL) }
@@ -538,7 +538,7 @@ module Docbookrx
         append_line %([#{special}])
       end
 
-      title_node = (node.at_css '> title') || (node.at_css '> info > title')
+      title_node = (node.at_css '> title') || (node.at_css '> refmeta > refentrytitle') || (node.at_css '> info > title')
       title = if title_node
                 if (subtitle_node = (node.at_css '> subtitle') || (node.at_css '> info > subtitle'))
                   title_node.inner_html += %(: #{subtitle_node.inner_html})
@@ -1136,6 +1136,39 @@ module Docbookrx
         append_line '____'
       end
       false
+    end
+
+    def visit_refsynopsisdiv node
+      append_blank_line
+      append_line %(#{'=' * @level} )
+      append_text "Synopsis"
+      append_blank_line
+      append_blank_line
+      @lines.pop if @lines[-1].empty?
+      true
+    end
+    def visit_refnamediv node
+      append_blank_line
+      append_line %(#{'=' * @level} )
+      append_text "Name"
+      append_blank_line
+      node.children.each do |child|
+        if child.name == 'refname'
+          append_text child.text
+          append_text " -- "
+        elsif child.name == 'refpurpose'
+          append_text child.text
+        else
+          child.accept self
+        end
+      end
+      append_blank_line
+      append_blank_line
+      false
+    end
+
+    def visit_refmeta node
+      append_blank_line
     end
 
     def visit_table node
